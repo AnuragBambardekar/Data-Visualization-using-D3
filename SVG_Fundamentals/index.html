@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>SVG Fundamentals</title>
+  </head>
+  <body>
+    <div class="message">Hello HTML!</div>
+    
+    <!--Create SVG-->
+    <svg width="960" height="500">
+        <circle cx="50" cy="50" r="50"></circle>
+        <circle cx="150" cy="50" r="50" fill="red"></circle>
+        <circle cx="150" cy="50" r="30" fill="green"></circle>
+        <rect x="250" y="5" width="400" height="100" fill="yellow" stroke="blue" stroke-width="4"></rect>
+        <line x1="0" y1="0" x2="100" y2="100" stroke="navy"></line>
+
+        <path
+            fill="none"
+            d="M200,200L300,300L300,400"
+            stroke="black"
+            stroke-width="10"
+            >
+        </path>
+
+        <path 
+            fill="none"
+            stroke="red"
+            d="M 10,30 
+            A 20,20 0,0,1 50,30
+            A 20,20 0,0,1 90,30
+            Q 90,60 50,90
+            Q 10,60 10,30 z"    
+            >
+        </path>
+    </svg>
+  </body>
+</html>
