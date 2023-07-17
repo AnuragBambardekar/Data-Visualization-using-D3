@@ -2,7 +2,7 @@
 
 **HTML** - language of the web
 
-![HTML](image.png)
+![Alt text](image-1.png)
 
 SVG - Scalable Vector Graphics
 CSS - Cascading Style Sheets
