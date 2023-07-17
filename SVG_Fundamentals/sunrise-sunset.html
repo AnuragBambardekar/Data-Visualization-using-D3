@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <style>
+      svg {
+        background-color: #87ceeb;
+      }
+      #sky {
+        animation: sunrise-sunset 8s infinite;
+        fill: url(#sky-gradient);
+      }
+      #sun {
+        animation: sunrise-sunset 8s infinite;
+      }
+      @keyframes sunrise-sunset {
+        0% {
+          transform: translate(0, 100%);
+        }
+        50% {
+          transform: translate(0, 0);
+        }
+        100% {
+          transform: translate(0, 100%);
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <svg width="400" height="300">
+        <defs>
+            <linearGradient id="sky-gradient" x1="0%" y1="0%" x2="0%" y2="100%">
+                <stop offset="0%" style="stop-color: #800080;" />
+                <stop offset="100%" style="stop-color: #ff00ff;" />
+            </linearGradient>
+        </defs>
+        <rect id="sky" x="0" y="0" width="400" height="300" fill="#87ceeb" />
+        <circle id="sun" cx="200" cy="150" r="40" fill="yellow" />
+    </svg>
+  </body>
+</html>
