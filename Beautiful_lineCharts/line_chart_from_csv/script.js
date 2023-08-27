@@ -16,6 +16,13 @@ const svg = d3.select("#chart-container")
 .append("g")
 .attr("transform",`translate(${margin.left},${margin.top})`);
 
+
+// Create a tooltip div
+const tooltip = d3.select("body")
+.append("div")
+.attr("class", "tooltip");
+
+
 // load and process data from .csv
 d3.csv("jdi_data_daily.csv").then(function(data){
     // console.log(data)
@@ -89,7 +96,7 @@ svg.selectAll("xGrid")
 .attr("stroke", "#e0e0e0")
 .attr("stroke-width", .5);
 
-// // Add horizontal gridlines
+// Add horizontal gridlines
 
 svg.selectAll("yGrid")
 .data(y.ticks((d3.max(data, d => d.population) - 65000) / 5000).slice(1))
@@ -114,6 +121,62 @@ svg.append("path")
 .attr("stroke","steelblue")
 .attr("stroke-width",1)
 .attr("d", line)
+
+
+// add a circle element
+const circle = svg.append("circle")
+.attr("r",0)
+.attr("fill","steelblue")
+.style("stroke","white")
+.attr("opacity",.70)
+.style("pointer-events","none");
+
+// create a listening rectangle and append it to the chart container
+const listeningRect = svg.append("rect")
+.attr("width",width)
+.attr("height",height);
+
+// create the mouse move function
+listeningRect.on("mousemove", function(event) {
+  const [xCoord] = d3.pointer(event, this);
+  const bisectDate = d3.bisector(d => d.date).left;
+  const x0 = x.invert(xCoord);
+  const i = bisectDate(data, x0, 1);
+  const d0 = data[i-1];
+  const d1 = data[i];
+  const d = x0 - d0.date > d1.date - x0 ? d1:d0;
+  const xPos = x(d.date);
+  const yPos = y(d.population);
+
+  // update the circle function
+  circle.attr("cx", xPos)
+  .attr("cy", yPos);
+
+  // console.log(xPos);
+
+  // update the radius of the circle
+  circle.transition()
+  .duration(50)
+  .attr("r",5);
+
+  // add the tooltip
+  tooltip
+  .style("display","block")
+  .style("left", `${xPos + 100}px`)
+  .style("top", `${yPos + 50}px`)
+  .html(`<strong>Date:</strong> ${d.date.toLocaleDateString()}<br>
+  <strong>Population:</strong> ${d.population !== undefined ? (d.population / 1000).toFixed(0) + 'k' : 'N/A'}`)
+
+});
+
+
+listeningRect.on("mouseleave", function() {
+  circle.transition()
+  .duration(50)
+  .attr("r",0);
+
+  tooltip.style("display","none")
+});
 
 // Add Y-axis label
 svg.append("text")
