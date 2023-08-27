@@ -4,6 +4,26 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>North American Emissions </title>
+
+    <style>
+        rect {
+            pointer-events: all;
+            fill-opacity: 0;
+            stroke-opacity: 0;
+            z-index: 1;
+        }
+
+        .tooltip {
+            position: absolute;
+            padding: 10px;
+            background-color: steelblue;
+            color: white;
+            border: 1px solid white;
+            border-radius: 10px;
+            display: none;
+            opacity: .75;
+        }
+    </style>
 </head>
 <body>
     <div id="chart-container"></div>
