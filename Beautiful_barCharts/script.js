@@ -1,7 +1,7 @@
 // Set up the dimensions of the chart
-const margin = { top: 70, right: 40, bottom: 60, left: 175 }
-const width = 660 - margin.left - margin.right
-const height = 400 - margin.top - margin.bottom
+const margin = { top: 70, right: 40, bottom: 60, left: 70 }
+const width = 2000 - margin.left - margin.right
+const height = 1000 - margin.top - margin.bottom
 
 // Create the SVG container for the chart
 const svg = d3.select("#chart").append("svg")
@@ -16,63 +16,43 @@ d3.csv("NA_Emissions.csv").then(data => {
     d.emissions = +d.emissions;
   });
 
-//   console.log(data)
+  // console.log(data)
 
   // Sort the data by emissions
-  data.sort(function (a, b) {
-    return d3.ascending(a.emissions, b.emissions);
-  });
+  // data.sort(function (a, b) {
+  //   return d3.ascending(a.emissions, b.emissions);
+  // });
+  
+  // Filter data to get every 4th date
+  // const filteredData = data.filter((d, i) => i % 4 === 0);
+  // console.log(filteredData)
 
+  let barHover = (e) => {
+    let hbar = d3.select(e.srcElement)
+    hbar.attr("fill",'#AEC09A')
+  }
+  
   // Set the x and y scales
   const x = d3.scaleLinear()
     .range([0, width])
-    .domain([0, d3.max(data, function (d) { return d.emissions; })]);
+    .domain([0, d3.max(data, function (d) { return d.emissions; })+1000]);
 
-
-// Filter data to get every 4th date
-const filteredData = data.filter((d, i) => i % 4 === 0);
-
-// Create the y scale with filtered data
-const y = d3.scaleBand()
-  .range([height, 0])
-  .padding(0.1)
-  .domain(filteredData.map(function (d) { return d.date; }));
-
-    // const customTickFormat = (value, index, ticks) => {
-    //     if (index % 4 === 0) { // Display the year for every 4th tick
-    //       return value;
-    //     }
-    //     return ""; // Return an empty string for other ticks
-    //   };
+  // Create the y scale with filtered data
+  const y = d3.scaleBand()
+    .range([height, 0])
+    .padding(0.1)
+    .domain(data.map(function (d) { return d.date; }));
 
   // Create the x and y axes
   const xAxis = d3.axisBottom(x)
-    .ticks(5)
-    .tickSize(0); // remove ticks
-
+    .ticks(8)
+    .tickSize(0);
 
   const yAxis = d3.axisLeft(y)
   .tickSize(0)
-  .tickPadding(10)
-//   .tickFormat(customTickFormat);
+  .tickPadding(10);
 
-
-
-  // Add vertical gridlines
-  svg.selectAll("line.vertical-grid")
-    .data(x.ticks(5))
-    .enter()
-    .append("line")
-    .attr("class", "vertical-grid")
-    .attr("x1", function (d) { return x(d); })
-    .attr("y1", 0)
-    .attr("x2", function (d) { return x(d); })
-    .attr("y2", height)
-    .style("stroke", "gray")
-    .style("stroke-width", 0.5)
-    .style("stroke-dasharray", "3 3");
-
-//   // Create the bars for the chart
+  // Create the bars for the chart
   svg.selectAll(".bar")
     .data(data)
     .enter().append("rect")
@@ -82,6 +62,24 @@ const y = d3.scaleBand()
     .attr("x", 0)
     .attr("width", function (d) { return x(d.emissions); })
     .attr('fill', '#96a5b9')
+    .on("mouseover", barHover)
+    .on("mouseout", (e) => {
+        d3.select(e.srcElement).transition().attr("fill", '#96a5b9')
+    })
+
+  // Add vertical gridlines
+  svg.selectAll("line.vertical-grid")
+  .data(x.ticks(8))
+  .enter()
+  .append("line")
+  .attr("class", "vertical-grid")
+  .attr("x1", function (d) { return x(d); })
+  .attr("y1", 0)
+  .attr("x2", function (d) { return x(d); })
+  .attr("y2", height)
+  .style("stroke", "gray")
+  .style("stroke-width", 0.5)
+  .style("stroke-dasharray", "3 3");
 
   // Add the x and y axes to the chart
   svg.append("g")
@@ -89,61 +87,55 @@ const y = d3.scaleBand()
     .style("font-size", "10px")
     .attr("transform", "translate(0," + height + ")")
     .call(xAxis)
-    // .call(g => g.select(".domain").remove());
+    .call(g => g.select(".domain").remove())
 
   svg.append("g")
-    // .attr("class", "y axis")
-    .style("font-size", "8px")
+    .attr("class", "y axis")
+    .style("font-size", "10px")
     .call((yAxis))
-    
-//     .selectAll('path')
-    // .style('stroke-width', '1.75px');
-})
-//   svg.selectAll(".y.axis .tick text")
-//     .text(function (d) {
-//       return d.toUpperCase();
-//     });
+    .selectAll('path')
+    .style('stroke-width', '1.75px');
 
-
-//   // Add labels to the end of each bar
+  // Add labels to the end of each bar
   svg.selectAll(".label")
-    .data(data)
-    .enter().append("text")
-    .attr("x", function (d) { return x(d.emissions) + 5; })
-    .attr("y", function (d) { return y(d.date) + y.bandwidth() / 2; })
-    .attr("dy", ".35em")
-    .style("font-family", "sans-serif")
-    .style("font-size", "10px")
-    .style("font-weight", "bold")
-    .style('fill', '#3c3d28')
-    .text(function (d) { return d.emissions; });
+  .data(data)
+  .enter().append("text")
+  .attr("x", function (d) { return x(d.emissions) + 5; })
+  .attr("y", function (d) { return y(d.date) + y.bandwidth() / 2; })
+  .attr("dy", ".35em")
+  .style("font-family", "sans-serif")
+  .style("font-size", "10px")
+  .style("font-weight", "bold")
+  .style('fill', '#3c3d28')
+  .text(function (d) { return d.emissions; });
 
-//   // Add emissions label
+  // Add emissions label
   svg.append("text")
-    .attr("transform", "translate(" + width / 2 + "," + (height + margin.bottom / 2) + ")")
-    .style("text-anchor", "middle")
-    .style("font-size", "10px")
-    .style("fill", "black")
+  .attr("transform", "translate(" + width / 2 + "," + (height + margin.bottom / 2) + ")")
+  .style("text-anchor", "middle")
+  .style("font-size", "18px")
+  .style("fill", "black")
+  .style("font-family", "sans-serif")
+  .attr("dy", "1em")
+  .text("Emissions");
+
+  // Add the chart title
+  svg.append("text")
+    .attr("x", margin.left - 100)
+    .attr("y", margin.top - 110)
+    .style("font-size", "14px")
+    .style("font-weight", "bold")
     .style("font-family", "sans-serif")
-    .attr("dy", "1em")
-    .text("emissions");
+    .text("Emissions per year");
 
-//   // Add the chart title
-//   svg.append("text")
-//     .attr("x", margin.left - 335)
-//     .attr("y", margin.top - 110)
-//     .style("font-size", "14px")
-//     .style("font-weight", "bold")
-//     .style("font-family", "sans-serif")
-//     .text("Bog Mummies Are the Most Frequently Observed Preservation State");
+  // Add the chart data source
+  svg.append("text")
+    .attr("transform", "translate(" + (margin.left - 100) + "," + (height + margin.bottom - 10) + ")")
+    .style("text-anchor", "start")
+    .style("font-size", "18px")
+    .style("fill", "lightgray")
+    .style("font-family", "sans-serif")
+    .text("Source: Unknown")
 
-//   // Add the chart data source
-//   svg.append("text")
-//     .attr("transform", "translate(" + (margin.left - 335) + "," + (height + margin.bottom - 10) + ")")
-//     .style("text-anchor", "start")
-//     .style("font-size", "8px")
-//     .style("fill", "lightgray")
-//     .style("font-family", "sans-serif")
-//     .html("<a href='https://www.cambridge.org/core/journals/antiquity/article/bogs-bones-and-bodies-the-deposition-of-human-remains-in-northern-european-mires-9000-bcad-1900/B90A16A211894CB87906A7BCFC0B2FC7#supplementary-materials'>Source: Bogs, Bones and Bodies - Published by Cambridge Press</a>");
 
-// });
+});
